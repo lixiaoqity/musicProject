@@ -1,0 +1,146 @@
+﻿@model Assignment6.Models.ArtistWithMediaInfoViewModel
+
+@{
+    ViewBag.Title = "Artist details";
+    var userAccount = new Assignment6.Controllers.RequestUser(User as System.Security.Claims.ClaimsPrincipal);
+}
+
+<h2>Artist details - @Model.Name</h2>
+
+<div>
+
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+            <hr />
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BirthName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BirthName)
+            <hr />
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.BirthOrStartDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BirthOrStartDate)
+            <hr />
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.UrlArtist)
+        </dt>
+
+        <dd>
+            <img src="@Html.DisplayFor(model => model.UrlArtist)" style="width:150px" />
+            <hr />
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Genre)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Genre)
+            <hr />
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Biography)
+        </dt>
+
+        <dd>
+            @*@Html.DisplayFor(model => model.Biography)*@
+            <div class="panel panel-default panel-body">
+                @Html.Raw(Model.Biography)
+            </div>
+            <hr />
+        </dd>
+
+        @if (Model.ArtistMediaItems.Count() < 1)
+        {
+        }
+        else
+        {
+            <dt>
+                Photos
+            </dt>
+            <dd>
+                @foreach (var item in Model.ArtistMediaItems.Where(m => m.ContentType.Contains("image/")))
+                {
+                    <div>
+                        <span>@item.Caption</span><br />
+                        <img src="~/artistMediaItem/@item.StringId" alt="@item.Caption" title="@item.Caption" width="200" />
+                    </div>
+                }
+                <hr />
+            </dd>
+
+            <dt>
+                Audio
+            </dt>
+            <dd>
+                @foreach (var item in Model.ArtistMediaItems.Where(m => m.ContentType.Contains("audio/")))
+                {
+                    <div>
+                        <span>@item.Caption</span><br />
+                        <audio src="~/artistMediaItem/@item.StringId" controls="controls"></audio>
+                    </div>
+                }
+                <hr />
+            </dd>
+
+            <dt>
+                Documents
+            </dt>
+            <dd>
+                @foreach (var item in Model.ArtistMediaItems.Where(m => m.ContentType.Contains("application/")))
+                {
+                    <div>
+                        <span>@item.Caption</span><br />
+                        <a href="~/artistMediaItem/@item.StringId/download">
+                            @if (item.ContentType.Contains("word"))
+                            {
+                                <img src="~/Content/Images/icon-word.png" alt="@item.Caption" title="@item.Caption" />
+                            }
+                            @if (item.ContentType.Contains("pdf"))
+                            {
+                                <img src="~/Content/Images/icon-pdf.png" alt="@item.Caption" title="@item.Caption" />
+                            }
+                            @if (item.ContentType.Contains("excel"))
+                            {
+                                <img src="~/Content/Images/icon-excel.png" alt="@item.Caption" title="@item.Caption" />
+                            }
+                        </a>
+                    </div>
+                }
+                <hr />
+            </dd>
+        }
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "Index")
+    @if (userAccount.HasRoleClaim("Coordinator"))
+    {
+        <span>|</span>
+        @Html.ActionLink("Add album for this artist", "AddAlbum", new { id = Model.Id })
+    }
+    @if (userAccount.HasRoleClaim("Executive"))
+    {
+        <span>|</span>
+        @Html.ActionLink("Add media for this artist", "AddArtistMediaItem", new { id = Model.Id })
+    }
+</p>
